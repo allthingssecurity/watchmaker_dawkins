@@ -1,0 +1,78 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!--[if lt IE 7]>      <html class="lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html> <!--<![endif]-->
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<title>Watchmaker Academy: LEARNER DUDE</title>
+	<meta name="description" content="A game by Dream Show Adventures for Ludum Dare 29."/>
+	<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Press+Start+2P">
+	<style type="text/css">
+		body {
+			background-color: #333;
+		}
+		
+		#ludumdare29 {
+			width:320px;
+			height:512px;
+			position:absolute;
+			left:50%;
+			top:50%;
+			margin:-256px 0 0 -160px;
+			border: 2px solid white;
+			font-family: 'Press Start 2P';
+		}
+		/* Apparently this forces the browser to load the font */
+		/* This works but NOT if set to display: none */
+		#loadfont {
+			font-family: 'Press Start 2P';
+			color: #333;
+		}
+	</style>
+</head>
+<body>
+	<div id="ludumdare29"></div>
+	<div id="loadfont">I'm invisible!</div>
+</body>
+<script src="js/phaser.min.js"></script>
+<script src="js/game.min.js"></script>
+
+<!-- Watchmaker Book Overlay (DOM, outside canvas) -->
+<style>
+  #book-overlay { position: fixed; inset: 0; display: none; z-index: 9999; }
+  #book-overlay .shade { position: absolute; inset:0; background: rgba(0,0,0,0.6); }
+  #book-overlay .panel {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    width: 90vw; max-width: 520px; max-height: 80vh; overflow: auto;
+    background: rgba(20,20,20,0.95); color: #fff; border: 2px solid #fff; padding: 16px;
+    font-family: 'Press Start 2P', monospace; line-height: 1.4;
+  }
+  #book-title { font-size: 16px; margin: 0 0 12px 0; }
+  #book-lines { font-size: 12px; white-space: pre-wrap; }
+  #book-close { margin-top: 12px; font-size: 12px; opacity: 0.8; }
+  #concept-toast {
+    position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
+    background: rgba(0,0,0,0.7); color: #ffff88; border: 1px solid #fff;
+    padding: 6px 10px; border-radius: 4px; z-index: 9998; opacity: 0; pointer-events: none;
+    transition: opacity 200ms ease-in-out; font-family: 'Press Start 2P', monospace; font-size: 12px;
+  }
+</style>
+<div id="book-overlay">
+  <div class="shade"></div>
+  <div class="panel">
+    <h3 id="book-title">Concepts</h3>
+    <div id="book-lines"></div>
+    <div style="margin-top:12px; display:flex; justify-content:space-between; align-items:center; gap:8px;">
+      <button id="book-prev" style="font-family:'Press Start 2P'; font-size:12px;">Prev</button>
+      <div id="book-page" style="font-size:12px; opacity:0.85;">1/1</div>
+      <button id="book-next" style="font-family:'Press Start 2P'; font-size:12px;">Next</button>
+    </div>
+    <button id="book-close-btn" style="margin-top:10px; font-family:'Press Start 2P'; font-size:12px;">Close (B or Esc)</button>
+    <div id="book-close" style="font-size:12px; opacity:0.8;">Press B or Esc to close</div>
+  </div>
+  
+</div>
+<div id="concept-toast"></div>
+</html>
