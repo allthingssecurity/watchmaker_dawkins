@@ -9,11 +9,12 @@
 	<title>Watchmaker Academy: LEARNER DUDE</title>
 	<meta name="description" content="A game by Dream Show Adventures for Ludum Dare 29."/>
 	<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Press+Start+2P">
+	<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Cinzel:wght@400;700&display=swap">
 	<style type="text/css">
 		body {
 			background-color: #333;
 		}
-		
+
 		#ludumdare29 {
 			width:320px;
 			height:512px;
@@ -24,8 +25,6 @@
 			border: 2px solid white;
 			font-family: 'Press Start 2P';
 		}
-		/* Apparently this forces the browser to load the font */
-		/* This works but NOT if set to display: none */
 		#loadfont {
 			font-family: 'Press Start 2P';
 			color: #333;
@@ -39,40 +38,239 @@
 <script src="js/phaser.min.js"></script>
 <script src="js/game.min.js"></script>
 
-<!-- Watchmaker Book Overlay (DOM, outside canvas) -->
+<!-- Realistic Book Overlay -->
 <style>
-  #book-overlay { position: fixed; inset: 0; display: none; z-index: 9999; }
-  #book-overlay .shade { position: absolute; inset:0; background: rgba(0,0,0,0.6); }
-  #book-overlay .panel {
-    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-    width: 90vw; max-width: 520px; max-height: 80vh; overflow: auto;
-    background: rgba(20,20,20,0.95); color: #fff; border: 2px solid #fff; padding: 16px;
-    font-family: 'Press Start 2P', monospace; line-height: 1.4;
+  #book-overlay {
+    position: fixed; inset: 0; display: none; z-index: 9999;
+    perspective: 1500px;
   }
-  #book-title { font-size: 16px; margin: 0 0 12px 0; }
-  #book-lines { font-size: 12px; white-space: pre-wrap; }
-  #book-close { margin-top: 12px; font-size: 12px; opacity: 0.8; }
+  #book-overlay .shade {
+    position: absolute; inset:0;
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.9) 100%);
+  }
+
+  /* Book Container */
+  .book-container {
+    position: absolute; left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 90vw; max-width: 700px; height: 80vh; max-height: 500px;
+    display: flex;
+    transform-style: preserve-3d;
+  }
+
+  /* Book Spine */
+  .book-spine {
+    width: 30px;
+    background: linear-gradient(90deg, #2d1810 0%, #4a2c1a 50%, #2d1810 100%);
+    border-radius: 3px 0 0 3px;
+    box-shadow: inset -2px 0 5px rgba(0,0,0,0.5), 2px 0 10px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .book-spine::after {
+    content: '';
+    width: 2px;
+    height: 90%;
+    background: linear-gradient(180deg, #8b6914 0%, #d4a84b 50%, #8b6914 100%);
+    border-radius: 1px;
+  }
+
+  /* Left Page */
+  .book-page-left {
+    flex: 1;
+    background: linear-gradient(135deg, #f5e6c8 0%, #e8d5a3 50%, #f0e0b8 100%);
+    border-radius: 3px 0 0 3px;
+    padding: 25px 20px 25px 30px;
+    box-shadow: inset 5px 0 15px rgba(0,0,0,0.1), inset 0 0 30px rgba(139,109,20,0.1);
+    overflow-y: auto;
+    position: relative;
+  }
+  .book-page-left::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0; width: 20px;
+    background: linear-gradient(90deg, rgba(0,0,0,0.15) 0%, transparent 100%);
+    pointer-events: none;
+  }
+
+  /* Right Page */
+  .book-page-right {
+    flex: 1;
+    background: linear-gradient(225deg, #f5e6c8 0%, #e8d5a3 50%, #f0e0b8 100%);
+    border-radius: 0 3px 3px 0;
+    padding: 25px 30px 25px 20px;
+    box-shadow: inset -5px 0 15px rgba(0,0,0,0.1), inset 0 0 30px rgba(139,109,20,0.1);
+    overflow-y: auto;
+    position: relative;
+  }
+  .book-page-right::before {
+    content: '';
+    position: absolute;
+    right: 0; top: 0; bottom: 0; width: 20px;
+    background: linear-gradient(270deg, rgba(0,0,0,0.1) 0%, transparent 100%);
+    pointer-events: none;
+  }
+
+  /* Page Content Styling */
+  .page-content {
+    font-family: 'IM Fell English', Georgia, serif;
+    color: #2c1810;
+    line-height: 1.6;
+    font-size: 14px;
+  }
+  .page-content h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 18px;
+    color: #4a2c1a;
+    margin: 0 0 15px 0;
+    text-align: center;
+    border-bottom: 2px solid #8b6914;
+    padding-bottom: 10px;
+  }
+  .page-content p {
+    margin: 10px 0;
+    text-align: justify;
+    text-indent: 20px;
+  }
+  .chapter-marker {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    color: #8b6914;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 5px;
+  }
+
+  /* Navigation */
+  .book-nav {
+    position: absolute;
+    bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  .book-nav-left { left: 50px; }
+  .book-nav-right { right: 50px; }
+
+  .book-nav button {
+    background: linear-gradient(180deg, #4a2c1a 0%, #2d1810 100%);
+    color: #d4a84b;
+    border: 2px solid #8b6914;
+    padding: 8px 15px;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.2s;
+  }
+  .book-nav button:hover {
+    background: linear-gradient(180deg, #5a3c2a 0%, #3d2820 100%);
+    transform: scale(1.05);
+  }
+  .book-nav button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .page-number {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    color: #8b6914;
+  }
+
+  /* Close Button */
+  .book-close-btn {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    background: rgba(0,0,0,0.7);
+    color: #d4a84b;
+    border: 1px solid #8b6914;
+    padding: 8px 15px;
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    cursor: pointer;
+    border-radius: 3px;
+  }
+
+  /* Page Flip Animation */
+  .page-flip {
+    animation: flipPage 0.4s ease-in-out;
+  }
+  @keyframes flipPage {
+    0% { transform: rotateY(0deg); opacity: 1; }
+    50% { transform: rotateY(-90deg); opacity: 0.5; }
+    100% { transform: rotateY(0deg); opacity: 1; }
+  }
+
+  .page-flip-reverse {
+    animation: flipPageReverse 0.4s ease-in-out;
+  }
+  @keyframes flipPageReverse {
+    0% { transform: rotateY(0deg); opacity: 1; }
+    50% { transform: rotateY(90deg); opacity: 0.5; }
+    100% { transform: rotateY(0deg); opacity: 1; }
+  }
+
+  /* Decorative Elements */
+  .page-decoration {
+    position: absolute;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 20px;
+    color: #8b6914;
+    opacity: 0.5;
+  }
+
+  /* Toast */
   #concept-toast {
     position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
-    background: rgba(0,0,0,0.7); color: #ffff88; border: 1px solid #fff;
-    padding: 6px 10px; border-radius: 4px; z-index: 9998; opacity: 0; pointer-events: none;
-    transition: opacity 200ms ease-in-out; font-family: 'Press Start 2P', monospace; font-size: 12px;
+    background: linear-gradient(180deg, #4a2c1a 0%, #2d1810 100%);
+    color: #d4a84b; border: 2px solid #8b6914;
+    padding: 10px 20px; border-radius: 5px; z-index: 9998; opacity: 0; pointer-events: none;
+    transition: opacity 300ms ease-in-out;
+    font-family: 'Cinzel', serif; font-size: 14px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
   }
 </style>
+
 <div id="book-overlay">
   <div class="shade"></div>
-  <div class="panel">
-    <h3 id="book-title">Concepts</h3>
-    <div id="book-lines"></div>
-    <div style="margin-top:12px; display:flex; justify-content:space-between; align-items:center; gap:8px;">
-      <button id="book-prev" style="font-family:'Press Start 2P'; font-size:12px;">Prev</button>
-      <div id="book-page" style="font-size:12px; opacity:0.85;">1/1</div>
-      <button id="book-next" style="font-family:'Press Start 2P'; font-size:12px;">Next</button>
+  <div class="book-container">
+    <button class="book-close-btn" id="book-close-btn">Close Book (B or Esc)</button>
+    <div class="book-spine"></div>
+    <div class="book-page-left" id="book-page-left">
+      <div class="page-content">
+        <div class="chapter-marker" id="book-chapter">Chapter I</div>
+        <h2 id="book-title">The Watchmaker's Wisdom</h2>
+        <div id="book-lines"></div>
+      </div>
+      <div class="page-decoration">❧</div>
+      <div class="book-nav book-nav-left">
+        <button id="book-prev">◀ Prev</button>
+        <span class="page-number" id="book-page">1/1</span>
+      </div>
     </div>
-    <button id="book-close-btn" style="margin-top:10px; font-family:'Press Start 2P'; font-size:12px;">Close (B or Esc)</button>
-    <div id="book-close" style="font-size:12px; opacity:0.8;">Press B or Esc to close</div>
+    <div class="book-page-right" id="book-page-right">
+      <div class="page-content">
+        <h2 id="book-title-right">Concepts Discovered</h2>
+        <div id="book-summary"></div>
+      </div>
+      <div class="page-decoration">❧</div>
+      <div class="book-nav book-nav-right">
+        <span class="page-number" id="book-total-concepts">0 concepts</span>
+        <button id="book-next">Next ▶</button>
+      </div>
+    </div>
   </div>
-  
 </div>
 <div id="concept-toast"></div>
+
+<!-- Page flip sound (base64 encoded short sound) -->
+<audio id="page-flip-sound" preload="auto">
+  <source src="data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAABhgC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAAYYNbUH2AAAAAAAAAAAAAAAAAAAA//tQZAAP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAETEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tQZB4P8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV" type="audio/mpeg">
+</audio>
+
 </html>
