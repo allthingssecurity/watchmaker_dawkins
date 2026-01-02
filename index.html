@@ -87,7 +87,7 @@
         bind('touch-right', 'right');
         bind('touch-boost', 'boost');
 
-        // Book button
+        // Book button (open)
         var bookBtn = document.getElementById('touch-book');
         if (bookBtn) {
             function openBook(e) {
@@ -97,6 +97,45 @@
             }
             bookBtn.addEventListener('touchstart', openBook, {passive: false});
             bookBtn.addEventListener('click', openBook);
+        }
+
+        // Book close button
+        var closeBtn = document.getElementById('book-close-btn');
+        if (closeBtn) {
+            function closeBook(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var evt = new KeyboardEvent('keydown', {key: 'Escape', keyCode: 27, bubbles: true});
+                document.dispatchEvent(evt);
+            }
+            closeBtn.addEventListener('touchstart', closeBook, {passive: false});
+            closeBtn.addEventListener('click', closeBook);
+        }
+
+        // Book prev button
+        var prevBtn = document.getElementById('book-prev');
+        if (prevBtn) {
+            function prevPage(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var evt = new KeyboardEvent('keydown', {key: 'ArrowLeft', keyCode: 37, bubbles: true});
+                document.dispatchEvent(evt);
+            }
+            prevBtn.addEventListener('touchstart', prevPage, {passive: false});
+            prevBtn.addEventListener('click', prevPage);
+        }
+
+        // Book next button
+        var nextBtn = document.getElementById('book-next');
+        if (nextBtn) {
+            function nextPage(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var evt = new KeyboardEvent('keydown', {key: 'ArrowRight', keyCode: 39, bubbles: true});
+                document.dispatchEvent(evt);
+            }
+            nextBtn.addEventListener('touchstart', nextPage, {passive: false});
+            nextBtn.addEventListener('click', nextPage);
         }
 
         // Prevent zoom
