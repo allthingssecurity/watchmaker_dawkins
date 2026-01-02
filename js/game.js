@@ -147,18 +147,34 @@ Book.prototype.show = function() {
     if (ov) ov.style.display = 'block';
     var prev = document.getElementById('book-prev');
     var next = document.getElementById('book-next');
-    if (prev) prev.onclick = function(e){ e.preventDefault(); self.pagePrev(); };
-    if (next) next.onclick = function(e){ e.preventDefault(); self.pageNext(); };
+    function prevHandler(e){ e.preventDefault(); e.stopPropagation(); self.pagePrev(); }
+    function nextHandler(e){ e.preventDefault(); e.stopPropagation(); self.pageNext(); }
+    if (prev) {
+        prev.onclick = prevHandler;
+        prev.ontouchend = prevHandler;
+    }
+    if (next) {
+        next.onclick = nextHandler;
+        next.ontouchend = nextHandler;
+    }
     var closeBtn = document.getElementById('book-close-btn');
-    if (closeBtn) closeBtn.onclick = function(e){ e.preventDefault(); self.hide(); };
+    function closeHandler(e){ e.preventDefault(); e.stopPropagation(); self.hide(); }
+    if (closeBtn) {
+        closeBtn.onclick = closeHandler;
+        closeBtn.ontouchend = closeHandler;
+    }
     var shade = ov ? ov.querySelector('.shade') : null;
     if (shade) shade.onclick = function(){ self.hide(); };
-    // Allow closing with B while paused (listen on DOM)
+    // Allow closing with B/Escape and navigation with arrows while paused (listen on DOM)
     this._keyHandler = function(e){
         if (!self.visible) return;
         var k = e.key || e.keyCode;
         if (k === 'b' || k === 'B' || k === 66 || k === 'Escape' || k === 'Esc' || k === 27) {
             e.preventDefault(); self.hide();
+        } else if (k === 'ArrowLeft' || k === 37) {
+            e.preventDefault(); self.pagePrev();
+        } else if (k === 'ArrowRight' || k === 39) {
+            e.preventDefault(); self.pageNext();
         }
     };
     document.addEventListener('keydown', this._keyHandler);
@@ -291,11 +307,14 @@ Bunny.prototype.update = function() {
 	
 	this.body.velocity.x = 0;
 	
-	if ((this.cursors.left.isDown || (this.game.input.pointer1.isDown && this.game.input.pointer1.screenX < this.game.width / 2)) && this.controllable) {
+	var touchLeft = window.touchInput && window.touchInput.left;
+	var touchRight = window.touchInput && window.touchInput.right;
+
+	if ((this.cursors.left.isDown || touchLeft || (this.game.input.pointer1.isDown && this.game.input.pointer1.screenX < this.game.width / 2)) && this.controllable) {
 		this.body.velocity.x = this.powertimer > 0 ? -POWER_TURN : -NORMAL_TURN;
 	}
-	
-	if ((this.cursors.right.isDown || (this.game.input.pointer1.isDown && this.game.input.pointer1.screenX >= this.game.width / 2)) && this.controllable) {
+
+	if ((this.cursors.right.isDown || touchRight || (this.game.input.pointer1.isDown && this.game.input.pointer1.screenX >= this.game.width / 2)) && this.controllable) {
 		this.body.velocity.x = this.powertimer > 0 ? POWER_TURN : NORMAL_TURN;
 	}
 	
@@ -328,7 +347,7 @@ Bunny.prototype.update = function() {
 		}
 		
 		this.boosting = false;
-	} else if (this.game.input.keyboard.justPressed(Phaser.Keyboard.SPACEBAR) && this.boost > 0) {
+	} else if ((this.game.input.keyboard.justPressed(Phaser.Keyboard.SPACEBAR) || (window.touchInput && window.touchInput.boost)) && this.boost > 0) {
 		this.body.velocity.y = BOOST_SPEED;
 		this.boost -= BOOST_DRAIN;
 		this.boosting = true;

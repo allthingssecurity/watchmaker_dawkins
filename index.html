@@ -34,7 +34,7 @@
             width: 75px; height: 75px; border-radius: 50%; border: 3px solid #fff;
             background: rgba(255,255,255,0.25); color: #fff; font-size: 26px;
             display: flex; align-items: center; justify-content: center;
-            user-select: none; -webkit-user-select: none;
+            user-select: none; -webkit-user-select: none; touch-action: manipulation;
         }
         .touch-btn.active { background: rgba(255,255,255,0.6); transform: scale(0.92); }
         .touch-btn-small { width: 50px; height: 50px; font-size: 18px; }
@@ -55,7 +55,7 @@
     </div>
 
     <script src="js/phaser.min.js"></script>
-    <script src="js/game.min.js"></script>
+    <script src="js/game.js"></script>
 
     <script>
     (function() {
@@ -99,45 +99,6 @@
             bookBtn.addEventListener('click', openBook);
         }
 
-        // Book close button
-        var closeBtn = document.getElementById('book-close-btn');
-        if (closeBtn) {
-            function closeBook(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                var evt = new KeyboardEvent('keydown', {key: 'Escape', keyCode: 27, bubbles: true});
-                document.dispatchEvent(evt);
-            }
-            closeBtn.addEventListener('touchstart', closeBook, {passive: false});
-            closeBtn.addEventListener('click', closeBook);
-        }
-
-        // Book prev button
-        var prevBtn = document.getElementById('book-prev');
-        if (prevBtn) {
-            function prevPage(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                var evt = new KeyboardEvent('keydown', {key: 'ArrowLeft', keyCode: 37, bubbles: true});
-                document.dispatchEvent(evt);
-            }
-            prevBtn.addEventListener('touchstart', prevPage, {passive: false});
-            prevBtn.addEventListener('click', prevPage);
-        }
-
-        // Book next button
-        var nextBtn = document.getElementById('book-next');
-        if (nextBtn) {
-            function nextPage(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                var evt = new KeyboardEvent('keydown', {key: 'ArrowRight', keyCode: 39, bubbles: true});
-                document.dispatchEvent(evt);
-            }
-            nextBtn.addEventListener('touchstart', nextPage, {passive: false});
-            nextBtn.addEventListener('click', nextPage);
-        }
-
         // Prevent zoom
         document.addEventListener('gesturestart', function(e) { e.preventDefault(); });
     })();
@@ -170,7 +131,7 @@
         .book-nav button {
             font-family: 'Cinzel', serif; font-size: 13px; padding: 10px 18px; border-radius: 4px;
             background: linear-gradient(to bottom, #4a3728, #2d1810); color: #d4a84b; border: 2px solid #8b6914;
-            min-width: 70px;
+            min-width: 70px; touch-action: manipulation; cursor: pointer;
         }
         .book-nav button:active { transform: scale(0.95); }
         .book-nav button:disabled { opacity: 0.3; }
@@ -178,7 +139,7 @@
         #book-close-btn {
             position: absolute; top: 12px; right: 12px; font-family: 'Cinzel', serif; font-size: 13px;
             background: #d4a84b; color: #2d1810; border: none; padding: 10px 16px; border-radius: 4px;
-            font-weight: bold; z-index: 10;
+            font-weight: bold; z-index: 10; touch-action: manipulation; cursor: pointer;
         }
         #book-close-btn:active { transform: scale(0.95); }
 
