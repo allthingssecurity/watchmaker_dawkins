@@ -507,29 +507,28 @@ module.exports = Gauge;
 'use strict';
 
 // small nugget, medium nugget, large nugget, small ruby, small emerald, small lapis
-// large ruby, large emerald, large lapis, DIAMOND
-
+// Custom collectibles from The Blind Watchmaker theme
+var COLLECTIBLE_FRAMES = ['compass.png', 'dna.png', 'earth.png', 'evolution.png', 'fossil.png', 'magnifier.png', 'sunflower.png', 'tree.png'];
 var GEM_VALUES = [1,2,3,4,5,6,7,8,9,10];
 
 var Gem = function(game, x, y, frame) {
-	Phaser.Sprite.call(this, game, x, y, 'images');
-	
-	this.gemValue = this.game.rnd.integerInRange(0,9);
-	this.frameName = "gems000" + this.gemValue + ".png";
-	
-	
-	// scale up!
+	Phaser.Sprite.call(this, game, x, y, 'collectibles');
+
+	this.gemValue = this.game.rnd.integerInRange(0, COLLECTIBLE_FRAMES.length - 1);
+	this.frameName = COLLECTIBLE_FRAMES[this.gemValue];
+
+	// scale for collectibles (64x64 sprites)
 	this.smoothed = false;
-	this.scale.x = 2;
-	this.scale.y = 2;
-	//
+	this.scale.x = 0.5;
+	this.scale.y = 0.5;
+
 	// center rotations
 	this.anchor.setTo(0.5, 0.5);
-	
+
 	this.game.physics.arcade.enableBody(this);
-	this.body.setSize(8, 8, 0, 0);
+	this.body.setSize(16, 16, 0, 0);
 	this.body.rotation = game.rnd.realInRange(-180, 180);
-	
+
 	// automatically kill after 15 seconds
 	this.lifespan = 15000;
 };
@@ -1502,6 +1501,7 @@ Preload.prototype = {
 		this.load.setPreloadSprite(this.loadbar);
 		
 		this.load.atlas('images', 'assets/atlas.png', 'assets/atlas.json');
+		this.load.atlas('collectibles', 'assets/collectibles.png', 'assets/collectibles.json');
 		this.load.audio('atlas', ['assets/atlas.ogg', 'assets/atlas.mp3'], true);
 		// Load curated concepts for in-game book (fallback to extracted if needed)
 		this.load.text('concepts', 'assets/concepts_curated.json');
