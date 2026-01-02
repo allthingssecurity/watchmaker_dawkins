@@ -952,16 +952,16 @@ Play.prototype = {
 		this.levelIndex = this.game.global && typeof this.game.global.levelIndex === 'number' ? this.game.global.levelIndex : 0;
 		// Define simple goals per level (depth, gems, wines)
     var LEVELS = [
-            {depth:150, gems:10, wines:2, title:'Ch 1 – Explaining the Very Improbable'},
-            {depth:220, gems:12, wines:2, title:'Ch 2 – Good Design'},
-            {depth:260, gems:14, wines:3, title:'Ch 3 – Accumulating Small Change'},
-            {depth:300, gems:16, wines:3, title:'Ch 4 – Making Tracks Through Animal Space'},
-            {depth:340, gems:18, wines:3, title:'Ch 5 – The Power and the Archives'},
-            {depth:380, gems:20, wines:4, title:'Ch 6 – Origins and Miracles'},
-            {depth:420, gems:22, wines:4, title:'Ch 7 – Constructive Evolution'},
-            {depth:460, gems:24, wines:4, title:'Ch 8 – Explosions and Spirals'},
-            {depth:500, gems:26, wines:5, title:'Ch 9 – Puncturing Punctuationism'},
-            {depth:560, gems:28, wines:5, title:'Ch 10 – The One True Tree of Life'}
+            {depth:20, gems:3, wines:0, title:'Ch 1 – Explaining the Very Improbable'},
+            {depth:40, gems:5, wines:0, title:'Ch 2 – Good Design'},
+            {depth:60, gems:7, wines:0, title:'Ch 3 – Accumulating Small Change'},
+            {depth:80, gems:9, wines:0, title:'Ch 4 – Making Tracks Through Animal Space'},
+            {depth:100, gems:11, wines:0, title:'Ch 5 – The Power and the Archives'},
+            {depth:120, gems:13, wines:0, title:'Ch 6 – Origins and Miracles'},
+            {depth:140, gems:15, wines:0, title:'Ch 7 – Constructive Evolution'},
+            {depth:160, gems:17, wines:0, title:'Ch 8 – Explosions and Spirals'},
+            {depth:180, gems:19, wines:0, title:'Ch 9 – Puncturing Punctuationism'},
+            {depth:200, gems:21, wines:0, title:'Ch 10 – The One True Tree of Life'}
         ];
 		this.levels = LEVELS;
         this.goals = LEVELS[Math.min(this.levelIndex, LEVELS.length-1)];
@@ -971,8 +971,10 @@ Play.prototype = {
 		
 		this.chunkGroup = this.game.add.group();
 		this.nextChunkY = 0;
-		this.game.world.bounds.x = 0;
-		this.game.world.bounds.height = 1024;
+		// Fully reset world and camera bounds for clean level start
+		this.game.world.setBounds(0, 0, 320, 1024);
+		this.game.camera.x = 0;
+		this.game.camera.y = 0;
 		this.game.camera.setBoundsToWorld();
 		this.lastChunkIndex = 0;
 		this.tephra = this.game.add.group();
