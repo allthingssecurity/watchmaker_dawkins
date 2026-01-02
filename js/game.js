@@ -129,16 +129,35 @@ Book.prototype.loadConcepts = function(jsonText) {
 
 Book.prototype.unlockNext = function() {
     var idx = this.unlocked.length;
-    console.log('unlockNext: idx=' + idx + ', concepts.length=' + this.concepts.length);
     if (idx < this.concepts.length) {
         var c = this.concepts[idx];
         this.unlocked.push(c);
         this.pageIndex = this.unlocked.length - 1;
-        console.log('Unlocked: ' + (c.title || 'unknown'));
         return c;
     }
-    console.log('No more concepts to unlock');
     return null;
+};
+
+// Unlock all 10 concepts for a specific chapter (1-10)
+Book.prototype.unlockChapter = function(chapterNum) {
+    var count = 0;
+    for (var i = 0; i < this.concepts.length; i++) {
+        var c = this.concepts[i];
+        if (c.chapter === chapterNum) {
+            // Check if not already unlocked
+            var found = false;
+            for (var j = 0; j < this.unlocked.length; j++) {
+                if (this.unlocked[j] === c) { found = true; break; }
+            }
+            if (!found) {
+                this.unlocked.push(c);
+                count++;
+            }
+        }
+    }
+    console.log('Unlocked chapter ' + chapterNum + ': ' + count + ' concepts');
+    this.pageIndex = 0;
+    return count;
 };
 
 Book.prototype.toast = function(title) {
@@ -1321,6 +1340,12 @@ beginRun: function(){},
 	levelComplete: function() {
 		if (this._levelDone) return;
 		this._levelDone = true;
+
+        // Unlock all 10 concepts for this chapter
+        var chapterNum = this.levelIndex + 1;
+        this.book.unlockChapter(chapterNum);
+        this.book.toast('Chapter ' + chapterNum + ' Complete! 10 concepts unlocked!');
+
         // freeze gameplay updates
         this.dead = true;
         // hard-stop physics and effects
@@ -1480,12 +1505,6 @@ beginRun: function(){},
 		this.getEmitter.start(true, 1000, null, 25);
 		
 		this.sfx.play('gem');
-		// unlock a concept on gem pickup (toast only)
-        var c1 = this.book.unlockNext();
-        if (c1) {
-            this.book.toast(c1.title);
-            this.progress.concepts += 1;
-        }
 		this.progress.gems += 1;
 	},
 	collectCarrot: function(player, carrot) {
@@ -1497,12 +1516,6 @@ beginRun: function(){},
         this.bunny.powerup();
         // play hiccup when drinking wine
         this.sfx.play('hich');
-		// unlock a concept on wine pickup (toast only)
-        var c2 = this.book.unlockNext();
-        if (c2) {
-            this.book.toast(c2.title);
-            this.progress.concepts += 1;
-        }
 		this.progress.wines += 1;
 	},
 	hitRock: function(player, rock) {
