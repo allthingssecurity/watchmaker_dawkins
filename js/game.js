@@ -967,6 +967,9 @@ Play.prototype = {
         // Add concept goal per chapter (default 10)
         if (!this.goals.concepts) this.goals.concepts = 10;
         this.progress = {depth:0, gems:0, wines:0, concepts:0};
+        // Reset level completion flags
+        this._levelDone = false;
+        this._advancing = false;
 		
 		this.chunkGroup = this.game.add.group();
 		this.nextChunkY = 0;
