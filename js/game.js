@@ -101,18 +101,26 @@ Book.prototype.loadConcepts = function(jsonText) {
     try {
         var data = JSON.parse(jsonText);
         this.concepts = data.concepts || [];
-        // Split into chapters if provided as chapters array
+        // Flatten chapters - each concept gets its chapter number
         if (data.chapters && data.chapters.length) {
-            // Flatten with chapter markers
             var out = [];
-            for (var i=0;i<data.chapters.length;i++){
+            for (var i = 0; i < data.chapters.length; i++) {
                 var ch = data.chapters[i];
-                out.push({title: 'Chapter ' + (i+1) + ': ' + (ch.title||''), lines: [' ']});
-                for (var j=0;j<(ch.concepts||[]).length;j++) out.push(ch.concepts[j]);
+                var chapterTitle = ch.title || ('Chapter ' + (i+1));
+                var concepts = ch.concepts || [];
+                for (var j = 0; j < concepts.length; j++) {
+                    var c = concepts[j];
+                    out.push({
+                        chapter: i + 1,
+                        chapterTitle: chapterTitle,
+                        title: c.title,
+                        lines: c.lines || []
+                    });
+                }
             }
             this.concepts = out;
         }
-        console.log('Loaded ' + this.concepts.length + ' concepts');
+        console.log('Loaded ' + this.concepts.length + ' concepts from ' + (data.chapters ? data.chapters.length : 0) + ' chapters');
     } catch (e) {
         console.log('Error loading concepts: ' + e);
         this.concepts = [];
@@ -231,7 +239,7 @@ Book.prototype.renderPage = function() {
     this.pageIndex = idx;
     var cur = this.unlocked[idx];
 
-    if (chapterEl) chapterEl.textContent = 'Concept ' + (idx+1);
+    if (chapterEl) chapterEl.textContent = 'Chapter ' + (cur.chapter || '?') + ': ' + (cur.chapterTitle || '');
     if (titleEl) titleEl.textContent = cur.title || 'Concept';
     if (linesEl) {
         var html = '';
@@ -243,7 +251,7 @@ Book.prototype.renderPage = function() {
     }
     if (pageEl) pageEl.textContent = (idx+1) + '/' + this.unlocked.length;
     if (summaryEl) summaryEl.textContent = '';
-    if (totalEl) totalEl.textContent = this.unlocked.length + ' concepts discovered';
+    if (totalEl) totalEl.textContent = this.unlocked.length + ' of 100 concepts';
     ov.style.display = 'block';
 };
 
