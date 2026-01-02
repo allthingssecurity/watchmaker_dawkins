@@ -1115,6 +1115,11 @@ Play.prototype = {
         this.game.add.existing(this.book);
         var conceptsText = this.game.cache.getText('concepts');
         if (conceptsText) this.book.loadConcepts(conceptsText);
+        // Restore previously unlocked concepts from global state
+        if (this.game.global && this.game.global.bookUnlocked) {
+            this.book.unlocked = this.game.global.bookUnlocked.slice();
+            this.book.pageIndex = 0;
+        }
         this.toggleBookKey = this.game.input.keyboard.addKey(Phaser.Keyboard.B);
 	},//
 showLevelIntro: function() {},
@@ -1320,6 +1325,10 @@ beginRun: function(){},
             if (self._advancing) return; self._advancing = true;
             if (self.game.physics && self.game.physics.arcade) {
                 self.game.physics.arcade.isPaused = false;
+            }
+            // Save book state before advancing
+            if (self.book && self.book.unlocked) {
+                self.game.global.bookUnlocked = self.book.unlocked.slice();
             }
             self.game.global.levelIndex = (self.levelIndex+1);
             // Route through menu to ensure a clean re-entry (stabilizes input/physics)
