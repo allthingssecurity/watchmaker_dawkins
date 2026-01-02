@@ -112,19 +112,24 @@ Book.prototype.loadConcepts = function(jsonText) {
             }
             this.concepts = out;
         }
+        console.log('Loaded ' + this.concepts.length + ' concepts');
     } catch (e) {
+        console.log('Error loading concepts: ' + e);
         this.concepts = [];
     }
 };
 
 Book.prototype.unlockNext = function() {
     var idx = this.unlocked.length;
+    console.log('unlockNext: idx=' + idx + ', concepts.length=' + this.concepts.length);
     if (idx < this.concepts.length) {
         var c = this.concepts[idx];
         this.unlocked.push(c);
-        this.pageIndex = this.unlocked.length - 1; // jump to newest by default
+        this.pageIndex = this.unlocked.length - 1;
+        console.log('Unlocked: ' + (c.title || 'unknown'));
         return c;
     }
+    console.log('No more concepts to unlock');
     return null;
 };
 
@@ -202,22 +207,43 @@ Book.prototype.toggle = function() {
 Book.prototype.renderPage = function() {
     var ov = document.getElementById('book-overlay');
     if (!ov) return;
+    var chapterEl = document.getElementById('book-chapter');
     var titleEl = document.getElementById('book-title');
     var linesEl = document.getElementById('book-lines');
     var pageEl = document.getElementById('book-page');
-    var idx = Math.max(0, Math.min((this.pageIndex||0), this.unlocked.length-1));
-    this.pageIndex = idx;
+    var summaryEl = document.getElementById('book-summary');
+    var totalEl = document.getElementById('book-total-concepts');
+
+    console.log('Book render: unlocked=' + this.unlocked.length + ', concepts=' + this.concepts.length);
+
     if (this.unlocked.length === 0) {
-        if (titleEl) titleEl.textContent = 'Concepts';
-        if (linesEl) linesEl.textContent = 'No concepts unlocked yet.';
+        if (chapterEl) chapterEl.textContent = 'The Blind Watchmaker';
+        if (titleEl) titleEl.textContent = 'Collect items to unlock concepts!';
+        if (linesEl) linesEl.innerHTML = '<p>Drill down and collect the scientific artifacts (DNA, fossils, etc.) to discover concepts from Richard Dawkins\' book.</p>';
         if (pageEl) pageEl.textContent = '0/0';
+        if (summaryEl) summaryEl.textContent = '';
+        if (totalEl) totalEl.textContent = '0 concepts discovered';
         ov.style.display = 'block';
         return;
     }
+
+    var idx = Math.max(0, Math.min((this.pageIndex||0), this.unlocked.length-1));
+    this.pageIndex = idx;
     var cur = this.unlocked[idx];
+
+    if (chapterEl) chapterEl.textContent = 'Concept ' + (idx+1);
     if (titleEl) titleEl.textContent = cur.title || 'Concept';
-    if (linesEl) linesEl.textContent = (cur.lines || []).join('\n');
+    if (linesEl) {
+        var html = '';
+        var lines = cur.lines || [];
+        for (var i=0; i<lines.length; i++) {
+            html += '<p>' + lines[i] + '</p>';
+        }
+        linesEl.innerHTML = html;
+    }
     if (pageEl) pageEl.textContent = (idx+1) + '/' + this.unlocked.length;
+    if (summaryEl) summaryEl.textContent = '';
+    if (totalEl) totalEl.textContent = this.unlocked.length + ' concepts discovered';
     ov.style.display = 'block';
 };
 
