@@ -1268,13 +1268,12 @@ beginRun: function(){},
 	updateGoalsHUD: function() {
 		if (!this.goals) return;
         var title = this.goals.title || ('Level ' + (this.levelIndex+1));
-        this.goaltext.text = 'L' + (this.levelIndex+1) + ' ' + title + '\nD:' + this.progress.depth + '/' + this.goals.depth + 'm  G:' + this.progress.gems + '/' + this.goals.gems + '  W:' + this.progress.wines + '/' + this.goals.wines + '  C:' + this.progress.concepts + '/' + this.goals.concepts;
+        this.goaltext.text = 'L' + (this.levelIndex+1) + ': ' + title + '\nDepth:' + this.progress.depth + '/' + this.goals.depth + 'm  Gems:' + this.progress.gems + '/' + this.goals.gems;
 	},
 	checkLevelComplete: function() {
         if (!this.goals) return;
-        // complete if either concepts met or all numeric goals met
-        var numsMet = (this.progress.depth >= this.goals.depth && this.progress.gems >= this.goals.gems && this.progress.wines >= this.goals.wines);
-        if (this.progress.concepts >= this.goals.concepts || numsMet) {
+        // Level complete when depth and gems goals are met
+        if (this.progress.depth >= this.goals.depth && this.progress.gems >= this.goals.gems) {
             this.levelComplete();
         }
 	},
