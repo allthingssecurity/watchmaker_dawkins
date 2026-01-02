@@ -1267,12 +1267,12 @@ beginRun: function(){},
 	updateGoalsHUD: function() {
 		if (!this.goals) return;
         var title = this.goals.title || ('Level ' + (this.levelIndex+1));
-        this.goaltext.text = 'L' + (this.levelIndex+1) + ': ' + title + '\nDepth:' + this.progress.depth + '/' + this.goals.depth + 'm  Gems:' + this.progress.gems + '/' + this.goals.gems;
+        this.goaltext.text = 'L' + (this.levelIndex+1) + ': ' + title + '\nCollect: ' + this.progress.gems + '/' + this.goals.gems;
 	},
 	checkLevelComplete: function() {
         if (!this.goals) return;
-        // Level complete when depth and gems goals are met
-        if (this.progress.depth >= this.goals.depth && this.progress.gems >= this.goals.gems) {
+        // Level complete when gems goal is met (depth is natural as you drill)
+        if (this.progress.gems >= this.goals.gems) {
             this.levelComplete();
         }
 	},
